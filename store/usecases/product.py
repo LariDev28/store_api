@@ -5,7 +5,7 @@ import pymongo
 from store.db.mongo import db_client
 from store.models.product import ProductModel
 from store.schemas.product import ProductIn, ProductOut, ProductUpdate, ProductUpdateOut
-from store.core.exceptions import NotFoundException
+from store.core.exceptions import NotFoundException, ProductInsertException
 
 
 class ProductUsecase:
@@ -15,8 +15,13 @@ class ProductUsecase:
         self.collection = self.database.get_collection("products")
 
     async def create(self, body: ProductIn) -> ProductOut:
-        product_model = ProductModel(**body.model_dump())
-        await self.collection.insert_one(product_model.model_dump())
+       try:
+            product_model = ProductModel(**body.model_dump())
+            await self.collection.insert_one(product_model.model_dump())
+
+            return ProductOut(**product_model.model_dump())
+        except Exception as exc:
+            raise ProductInsertException(str(exc))
 
         return ProductOut(**product_model.model_dump())
 
