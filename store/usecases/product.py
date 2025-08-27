@@ -33,8 +33,16 @@ class ProductUsecase:
 
         return ProductOut(**result)
 
-    async def query(self) -> List[ProductOut]:
-        return [ProductOut(**item) async for item in self.collection.find()]
+    async def query(self, min_price: float = None, max_price: float = None) -> List[ProductOut]:
+        filter_query = {}
+        if min_price is not None or max_price is not None:
+            filter_query["price"] = {}
+            if min_price is not None:
+                filter_query["price"]["$gt"] = min_price
+            if max_price is not None:
+                filter_query["price"]["$lt"] = max_price
+
+        return [ProductOut(**item) async for item in self.collection.find(filter_query)]
 
     async def update(self, id: UUID, body: ProductUpdate) -> ProductUpdateOut:
          update_data = body.model_dump(exclude_none=True)
