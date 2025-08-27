@@ -6,7 +6,7 @@ from store.db.mongo import db_client
 from store.models.product import ProductModel
 from store.schemas.product import ProductIn, ProductOut, ProductUpdate, ProductUpdateOut
 from store.core.exceptions import NotFoundException, ProductInsertException
-
+from datetime import datetime
 
 class ProductUsecase:
     def __init__(self) -> None:
